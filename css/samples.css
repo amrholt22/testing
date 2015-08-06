@@ -1,5 +1,14 @@
-map {
-    height: 500px;
+.map {
+    height: 800px;
     width: 100%;
     background-color: #b5d0d0;
+}
+.half-map {
+    float: left;
+    height: 800px;
+    width: 50%;
+    background-color: #b5d0d0;
+}
+.button {
+    width: 100%
 }

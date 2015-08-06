@@ -10,6 +10,7 @@
     <body>
         <div id="map" class="map"></div>
         <div id="overlay" style="background-color: white; border-radius: 10px; border: 1px solid black; padding: 5px 10px;"></div>
+        <input type="checkbox" id="visible" checked onclick="visible()"> Toggle Layer Visiblity
         <script src="js/ol3/ol.js"></script>
         <script>
             var layer = new ol.layer.Tile({
@@ -26,7 +27,7 @@
                 view: view
             });
             var overlay = new ol.Overlay({
-                element: document.getElementById('overlay'), positioning: 'bottom-center'
+                element: document.getElementById('overlay'), positioning: 'bottom-left'
             });
             map.on('click', function (event) {
                 var coord = event.coordinate;
@@ -37,6 +38,13 @@
                 overlay.setPosition(coord);
                 map.addOverlay(overlay);
             });
+            function visible() {
+                var tf = layer.getVisible();
+                if (tf == true)
+                    layer.setVisible(false);
+                else
+                    layer.setVisible(true);
+            };
         </script>
     </body>
 </html>

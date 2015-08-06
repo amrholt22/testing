@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+        <link rel="stylesheet" href="css/ol.css" type="text/css" />
+        <link rel="stylesheet" href="css/samples.css" type="text/css" />
+    </head>
+    <body>
+        <div id="map" class="half-map"></div>
+        <div id="map2" class="half-map"></div>
+        <br>
+        
+        
+        <table>
+            <tr>
+                <td>
+                    <input type="checkbox" id="visible" onclick="visible();" checked> Toggle Layer Visibility
+                </td>
+                <td>
+                    <!--<button onclick="changeTarget();" class="button">Change Target</button>-->
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button onclick="doBounce(london);" class="button">Bounce to London</button>
+                </td>
+                <td>
+                    <button onclick="doBounce(rome);" class="button">Bounce to Rome</button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button onclick="doPan(london);" class="button">Pan to London</button>
+                </td>
+                <td>
+                    <button onclick="doPan(rome);" class="button">Pan to Rome</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button onclick="doRotate();" class="button">Rotate</button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="button" onclick="doZoom(2);">Zoom Out</button>
+                </td>
+                
+                <td>
+                    <button class="button" onclick="doZoom(0.5);">Zoom In</button>
+                </td>
+            </tr>
+        </table>
+        <script src="js/ol3/ol.js"></script>
+        <script>
+            var layer = new ol.layer.Tile({
+                source: new ol.source.OSM()
+            });
+            var london = ol.proj.transform([-0.12755, 51.507222], 'EPSG:4326', 'EPSG:3857');
+            var view = new ol.View({
+                center: london,
+                zoom: 6
+            });
+            var view2 = new ol.View({
+                zoom: 9
+            });
+            var map = new ol.Map({
+                target: 'map',
+                layers: [layer],
+                view: view,
+                renderer: 'canvas'
+            });
+            var map2 = new ol.Map({
+                target: 'map2',
+                layers: [layer]
+            });
+            function visible() {
+                var tf = layer.getVisible();
+                if (tf == true)
+                    layer.setVisible(false);
+                else
+                    layer.setVisible(true);
+            };
+            function changeTarget() {
+                var target = map.getTarget();
+                if (target == 'map')
+                    map.setTarget('map2');
+                else
+                    map.setTarget('map');
+            };
+            var rome = ol.proj.transform([12.5, 41.9], 'EPSG:4326', 'EPSG:3857');
+            function doBounce(location) {
+                var bounce = ol.animation.bounce({
+                    resolution: map.getView().getResolution() * 2
+                });
+                var pan = ol.animation.pan({
+                    source: map.getView().getCenter()
+                });
+                map.beforeRender(bounce);
+                map.beforeRender(pan);
+                map.getView().setCenter(location);
+            };
+            function doPan(location) {
+
+                var pan = ol.animation.pan({
+                    source: map.getView().getCenter()
+                });
+                map.beforeRender(pan);
+                map.getView().setCenter(location);
+            };
+            function doRotate() {
+                var rotate = ol.animation.rotate({
+                    rotation: Math.PI * 2
+                });
+                map.beforeRender(rotate);
+            };
+            function doZoom(factor) {
+                var resolution = map.getView().getResolution();
+                var zoom = ol.animation.zoom({
+                    resolution: resolution
+                });
+                map.beforeRender(zoom);
+                map.getView().setResolution(resolution * factor);
+            };
+            map2.setView(view2);
+            function updateMap2() {
+                map2.getView().setCenter(map.getView().getCenter());
+                map2.getView().setResolution((map.getView().getResolution()) * 8);
+            };
+            function updateMap() {
+                map.getView().setCenter(map2.getView().getCenter());
+                map.getView().setResolution((map2.getView().getResolution()) * 0.125);
+            };
+
+            map.on('moveend', updateMap2);
+            map2.on('moveend', updateMap);
+
+        </script>
+    </body>
+</html>
